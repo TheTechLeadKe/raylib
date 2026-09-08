@@ -1,0 +1,20 @@
+use raylib::init_window
+use raylib::window_should_close
+use raylib::begin_drawing
+use raylib::end_drawing
+use raylib::clear_background
+use raylib::Color
+use raylib::GREEN
+
+#[no_mangle]
+fn main(i32 argc,str *argv)->i32{
+    init_window(1000,800,"Ariel YES")
+
+    while !window_should_close(){
+        begin_drawing()
+        clear_background(GREEN())
+        end_drawing()
+    }
+
+    return 0
+}

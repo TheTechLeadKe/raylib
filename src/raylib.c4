@@ -1,0 +1,54 @@
+
+
+struct Color{
+    u8 red
+    u8 green
+    u8 blue
+    u8 alpha
+}
+
+impl Color{
+    fn init(u8 red,u8 green,u8 blue,u8 alpha){
+        self->red   = red
+        self->green = green
+        self->blue  = blue
+        self->alpha = alpha
+    }
+}
+
+fn GREEN()->Color{
+    Color color
+    color.init(0, 228, 48, 255)
+    return color
+}
+
+
+foreign "C"{
+    fn InitWindow(i32 width,i32 height,str title)
+    fn WindowShouldClose()->i32
+    fn BeginDrawing()
+    fn EndDrawing()
+    fn ClearBackground(Color color)
+}
+
+fn init_window(i32 width,i32 height,str title){
+    return InitWindow(width,height,title)
+}
+
+
+fn window_should_close()->i32{
+    return WindowShouldClose()
+}
+
+fn begin_drawing(){
+    return BeginDrawing()
+}
+
+fn end_drawing(){
+    return EndDrawing()
+}
+
+
+fn clear_background(Color color){
+    return ClearBackground(color)
+}
