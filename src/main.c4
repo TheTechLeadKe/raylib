@@ -8,7 +8,7 @@ use raylib::GREEN
 
 #[no_mangle]
 fn main(i32 argc,str *argv)->i32{
-    init_window(1000,800,"Ariel YES")
+    init_window(1800,900,"Ariel YES")
 
     while !window_should_close(){
         begin_drawing()
