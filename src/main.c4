@@ -1,20 +1,94 @@
+
+// Raylib Types
+use raylib::Key
+use raylib::Color
+use raylib::GREEN
+
 use raylib::init_window
+use raylib::close_window
 use raylib::window_should_close
 use raylib::begin_drawing
 use raylib::end_drawing
 use raylib::clear_background
-use raylib::Color
-use raylib::GREEN
+
+
+use raylib::draw_rectangle
+
+
+use raylib::is_key_down
+use raylib::is_key_up
+use raylib::is_key_pressed
+use raylib::is_key_pressed_repeat
+use raylib::is_key_released
+
+
+use raylib::get_frame_time
+use raylib::set_target_fps
+
+const f32 MAXIMUM_CAR_SPEED = 1000
+
+
+foreign "C"{
+    fn printf(str fmt,...)->i32
+}
+
 
 #[no_mangle]
 fn main(i32 argc,str *argv)->i32{
-    init_window(1800,900,"Ariel YES")
+    i32 width  = 1400
+    i32 height = 900
+
+    init_window(width,height,"Ariel YES")
+    defer close_window()
+
+    set_target_fps(60)
+
+    i32 carWidth  = 30
+    i32 carHeight = 45
+
+    i32 carX      = (width / 2) - (carWidth / 2)
+    i32 carY      = (height / 2) - (carHeight / 2)
+
+    f32 carSpeed  = 0.0 
 
     while !window_should_close(){
+        f32 delta = get_frame_time()
+
         begin_drawing()
-        clear_background(GREEN())
+        clear_background(background_color())
+
+        if is_key_down(Key::Up){
+            carSpeed += 0.3 * delta 
+
+            if carSpeed > MAXIMUM_CAR_SPEED{
+                carSpeed = MAXIMUM_CAR_SPEED
+            }
+
+        }
+        else{
+            carSpeed -= 0.1 * delta
+
+            if carSpeed < 0{
+                carSpeed = 0
+            }
+        }
+
+        carY -= carSpeed * delta
+
+        draw_rectangle(carX,carY,carWidth,carHeight,car_color())
         end_drawing()
     }
 
+
     return 0
+}
+
+
+fn background_color()->Color{
+    return Color::new(0,0,0,0)
+}
+
+
+fn car_color()->Color{
+    return Color::new(255,158,45,255)
 }

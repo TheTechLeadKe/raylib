@@ -1,4 +1,126 @@
 
+enum Key{
+    None         = 0
+
+    Apostrophe   = 39
+    Comma        = 44
+    Minus        = 45
+    Period       = 46
+    Slash        = 47
+    Zero         = 48
+    One          = 49
+    Two          = 50
+    Three        = 51
+    Four         = 52
+    Five         = 53
+    Six          = 54
+    Seven        = 55
+    Eight        = 56
+    Nine         = 57
+    Semicolon    = 59
+    Equal        = 61
+
+    A            = 65
+    B            = 66
+    C            = 67
+    D            = 68
+    E            = 69
+    F            = 70
+    G            = 71
+    H            = 72
+    I            = 73
+    J            = 74
+    K            = 75
+    L            = 76
+    M            = 77
+    N            = 78
+    O            = 79
+    P            = 80
+    Q            = 81
+    R            = 82
+    S            = 83
+    T            = 84
+    U            = 85
+    V            = 86
+    W            = 87
+    X            = 88
+    Y            = 89
+    Z            = 90
+
+    LeftBracket  = 91
+    Backslash    = 92
+    RightBracket = 93
+    Grave        = 96
+
+    Space        = 32
+    Escape       = 256
+    Enter        = 257
+    Tab          = 258
+    Backspace    = 259
+    Insert       = 260
+    Delete       = 261
+
+    Right        = 262
+    Left         = 263
+    Down         = 264
+    Up           = 265
+
+    PageUp       = 266
+    PageDown     = 267
+    Home         = 268
+    End          = 269
+
+    CapsLock     = 280
+    ScrollLock   = 281
+    NumLock      = 282
+    PrintScreen  = 283
+    Pause        = 284
+
+    F1           = 290
+    F2           = 291
+    F3           = 292
+    F4           = 293
+    F5           = 294
+    F6           = 295
+    F7           = 296
+    F8           = 297
+    F9           = 298
+    F10          = 299
+    F11          = 300
+    F12          = 301
+
+    LeftShift    = 340
+    LeftControl  = 341
+    LeftAlt      = 342
+    LeftSuper    = 343
+    RightShift   = 344
+    RightControl = 345
+    RightAlt     = 346
+    RightSuper   = 347
+    Menu         = 348
+
+    Kp0          = 320
+    Kp1          = 321
+    Kp2          = 322
+    Kp3          = 323
+    Kp4          = 324
+    Kp5          = 325
+    Kp6          = 326
+    Kp7          = 327
+    Kp8          = 328
+    Kp9          = 329
+    KpDecimal    = 330
+    KpDivide     = 331
+    KpMultiply   = 332
+    KpSubtract   = 333
+    KpAdd        = 334
+    KpEnter      = 335
+    KpEqual      = 336
+}
+
+
+
+
 
 struct Color{
     u8 red
@@ -28,16 +150,54 @@ fn GREEN()->Color{
 }
 
 
+struct AudioStream{
+    void *buffer
+    void *processor
+    u32 sampleRate
+    u32 sampleSize
+    u32 channels
+}
+
+
+struct Sound{
+    AudioStream stream
+    u32 frameCount
+}
+
 foreign "C"{
     fn InitWindow(i32 width,i32 height,str title)
+    fn CloseWindow()
     fn WindowShouldClose()->i32
     fn BeginDrawing()
     fn EndDrawing()
     fn ClearBackground(Color color)
+
+
+    fn DrawRectangle(i32 x,i32 y,i32 width,i32 height,Color color)
+
+    fn IsKeyDown(i32 key)->bool
+    fn IsKeyUp(i32 key)->bool
+    fn IsKeyPressed(i32 key)->bool
+    fn IsKeyPressedRepeat(i32 key)->bool
+    fn IsKeyReleased(i32 key)->bool
+
+    fn GetFrameTime()->f32
+
+    fn SetTargetFPS(i32 fps)
+
+
+    fn InitAudioDevice()
+    fn CloseAudioDevice()
+
+    fn LoadSound(const char *fileName)->Sound
 }
 
 fn init_window(i32 width,i32 height,str title){
     return InitWindow(width,height,title)
+}
+
+fn close_window(){
+    return CloseWindow()
 }
 
 
@@ -57,3 +217,65 @@ fn end_drawing(){
 fn clear_background(Color color){
     return ClearBackground(color)
 }
+
+
+
+fn draw_rectangle(i32 x,i32 y,i32 width,i32 height,Color color){
+    return DrawRectangle(x,y,width,height,color)
+}
+
+
+
+
+
+
+fn is_key_down(i32 key)->bool{
+    return IsKeyDown(key)
+}
+
+
+fn is_key_up(i32 key)->bool{
+    return IsKeyUp(key)
+}
+
+
+fn is_key_pressed(i32 key)->bool{
+    return IsKeyPressed(key)
+}
+
+
+fn is_key_pressed_repeat(i32 key)->bool{
+    return IsKeyPressedRepeat(key)
+}
+
+fn is_key_released(i32 key)->bool{
+    return IsKeyReleased(key)
+}
+
+
+
+
+fn get_frame_time()->f32{
+    return GetFrameTime()
+}
+
+
+fn set_target_fps(i32 framePerSecond){
+    return SetTargetFPS(framePerSecond)
+}
+
+
+fn init_audio_device(){
+    return init_audio_device()
+}
+
+fn close_audio_device(){
+    return close_audio_device()
+}
+
+
+fn load_sound(const char *fileName)->Sound{
+    return LoadSound(fileName)
+}
+
+
