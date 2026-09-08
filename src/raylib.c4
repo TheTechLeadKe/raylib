@@ -14,12 +14,17 @@ impl Color{
         self->blue  = blue
         self->alpha = alpha
     }
+
+    #[static(true)]
+    fn new(u8 red,u8 green,u8 blue,u8 alpha)->Color{
+        Color color
+        color.init(red,green,blue,alpha)
+        return color
+    }
 }
 
 fn GREEN()->Color{
-    Color color
-    color.init(0, 228, 48, 255)
-    return color
+    Color::new(0, 228, 48, 255)
 }
 
 
