@@ -1,0 +1,4 @@
+
+*.c4 linguist-language=Rust
+*.c4 linguist-vendored
+
