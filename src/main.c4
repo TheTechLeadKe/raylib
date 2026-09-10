@@ -129,6 +129,9 @@ fn main(i32 argc,str *argv)->i32{
         if is_key_down(Key::Left){
             carRotation -= ROTATION_SPEED * delta
         }
+        elif is_key_down(Key::Right){
+            carRotation += ROTATION_SPEED * delta
+        }
 
         if carRotation >= 360{
             carRotation = 0
