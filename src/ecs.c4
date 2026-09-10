@@ -1,0 +1,188 @@
+// Raylib Types
+use raylib::Key
+use raylib::Color
+use raylib::GREEN
+use raylib::Sound
+use raylib::Music
+
+use raylib::init_window
+use raylib::close_window
+use raylib::window_should_close
+use raylib::begin_drawing
+use raylib::end_drawing
+use raylib::clear_background
+
+
+use raylib::draw_rectangle
+
+
+use raylib::is_key_down
+use raylib::is_key_up
+use raylib::is_key_pressed
+use raylib::is_key_pressed_repeat
+use raylib::is_key_released
+
+
+use raylib::get_frame_time
+use raylib::set_target_fps
+
+
+use raylib::init_audio_device
+use raylib::close_audio_device
+
+use raylib::load_sound
+use raylib::play_sound
+
+
+use raylib::load_music_stream
+use raylib::play_music_stream
+use raylib::update_music_stream
+use raylib::stop_music_stream
+use raylib::pause_music_stream
+use raylib::resume_music_stream
+use raylib::unload_music_stream
+
+struct Vec2{
+    f32 x
+    f32 y
+}
+
+impl Vec2{
+    fn init(f32 x,f32 y){
+        self->x = x
+        self->y = y
+    }
+
+    #[static(true)]
+    fn new(f32 x,f32 y)->Vec2{
+        Vec2 node
+        node.init(x,y)
+        return node
+    }
+
+    fn get_x()->f32{
+        return self->x
+    }
+
+    fn get_y()->f32{
+        return self->y
+    }
+}
+
+
+struct Transform{
+    Vec2 position
+    Vec2 velocity
+    f32 angle
+}
+
+
+
+impl Transform{
+    fn init(Vec2 position,Vec2 velocity,f32 angle){
+        self->position = position
+        self->velocity = velocity
+        self->angle    = angle
+    }
+    
+
+    #[static(true)]
+    fn new(Vec2 position,Vec2 velocity,f32 angle)->Transform{
+        Transform node
+        node.init(position,velocity,angle)
+        return node
+    }
+
+    fn get_position()->Vec2{
+        return self->position
+    }
+
+
+    fn get_velocity()->Vec2{
+        return self->velocity
+    }
+
+    fn get_angle()->f32{
+        return self->angle
+    }
+}
+
+
+
+struct Shape{
+    f32 radius
+    i32 sides
+    Color fill
+    Color outline
+    f32 thickness
+}
+
+
+impl Shape{
+    fn init(f32 radius,i32 sides,Color fill,Color outline,f32 thickness){
+        self->radius    = radius
+        self->sides     = sides
+        self->fill      = fill
+        self->outline   = outline
+        self->thickness = thickness
+    }
+
+    #[static(true)]
+    fn new(f32 radius,i32 sides,Color fill,Color outline,f32 thickness)->Shape{
+        Shape node
+        node.init(radius,sides,fill,outline,thickness)
+        return node
+    }
+}
+
+
+struct Input{
+    i32 up
+    i32 down
+    i32 left
+    i32 right
+}
+
+impl Input{
+    fn init(i32 up,i32 down,i32 left,i32 right){
+        self->up    = up
+        self->down  = down
+        self->left  = left
+        self->right = right
+    }
+
+
+    #[static(true)]
+    fn new(i32 up,i32 down,i32 left,i32 right)->Input{
+        Input node
+        node.init(up,down,left,right)
+        return node
+    }
+   
+}
+
+
+
+struct LifeSpan{
+    i32 remaining
+    i32 total
+}
+
+impl LifeSpan{
+    fn init(i32 remaining,i32 total){
+        self->remaining = remaining
+        self->total     = total
+    }
+
+    #[static(true)]
+    fn new(i32 remaining,i32 total)->LifeSpan{
+        LifeSpan node
+        node.init(remaining,total)
+        return node
+    }
+}
+
+
+
+
+

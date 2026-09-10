@@ -164,6 +164,15 @@ struct Sound{
     u32 frameCount
 }
 
+
+struct Music{
+    AudioStream stream
+    u32 frameCount
+    bool looping
+    i32 ctxType
+    void *ctcData
+}
+
 foreign "C"{
     fn InitWindow(i32 width,i32 height,str title)
     fn CloseWindow()
@@ -190,6 +199,15 @@ foreign "C"{
     fn CloseAudioDevice()
 
     fn LoadSound(const char *fileName)->Sound
+    fn PlaySound(Sound sound)
+
+    fn LoadMusicStream(str fileName)->Music
+    fn PlayMusicStream(Music music)
+    fn UpdateMusicStream(Music music)
+    fn StopMusicStream(Music music)
+    fn PauseMusicStream(Music music)
+    fn ResumeMusicStream(Music music)
+    fn UnloadMusicStream(Music music)
 }
 
 fn init_window(i32 width,i32 height,str title){
@@ -266,16 +284,55 @@ fn set_target_fps(i32 framePerSecond){
 
 
 fn init_audio_device(){
-    return init_audio_device()
+    return InitAudioDevice()
 }
 
 fn close_audio_device(){
-    return close_audio_device()
+    return CloseAudioDevice()
 }
 
 
 fn load_sound(const char *fileName)->Sound{
     return LoadSound(fileName)
 }
+
+
+fn play_sound(Sound sound){
+    return PlaySound(sound)
+}
+
+fn load_music_stream(str fileName)->Music{
+    return LoadMusicStream(fileName)
+}
+
+
+fn play_music_stream(Music music){
+    return PlayMusicStream(music)
+}
+
+fn update_music_stream(Music music){
+    return UpdateMusicStream(music)
+}
+
+fn stop_music_stream(Music music){
+    return StopMusicStream(music)
+}
+
+
+fn pause_music_stream(Music music){
+    return PauseMusicStream(music)
+}
+
+
+fn resume_music_stream(Music music){
+    return ResumeMusicStream(music)
+}
+
+
+fn unload_music_stream(Music music){
+    return UnloadMusicStream(music)
+}
+
+
 
 

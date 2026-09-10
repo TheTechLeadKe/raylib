@@ -3,6 +3,8 @@
 use raylib::Key
 use raylib::Color
 use raylib::GREEN
+use raylib::Sound
+use raylib::Music
 
 use raylib::init_window
 use raylib::close_window
@@ -24,6 +26,22 @@ use raylib::is_key_released
 
 use raylib::get_frame_time
 use raylib::set_target_fps
+
+
+use raylib::init_audio_device
+use raylib::close_audio_device
+
+use raylib::load_sound
+use raylib::play_sound
+
+
+use raylib::load_music_stream
+use raylib::play_music_stream
+use raylib::update_music_stream
+use raylib::stop_music_stream
+use raylib::pause_music_stream
+use raylib::resume_music_stream
+use raylib::unload_music_stream
 
 const f32 MAXIMUM_CAR_SPEED = 1000
 
@@ -51,9 +69,19 @@ fn main(i32 argc,str *argv)->i32{
 
     f32 carSpeed  = 0.0 
 
+    init_audio_device()
+    defer close_audio_device()
+
+    Music music = load_music_stream("assets/sound/silence.mp3")
+    defer unload_music_stream(music)
+
+    play_music_stream(music)
+    defer stop_music_stream(music)
+
     while !window_should_close(){
         f32 delta = get_frame_time()
 
+        update_music_stream(music)
         begin_drawing()
         clear_background(background_color())
 
