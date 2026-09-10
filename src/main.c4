@@ -5,6 +5,8 @@ use raylib::Color
 use raylib::GREEN
 use raylib::Sound
 use raylib::Music
+use raylib::Rectangle
+use raylib::Vector2
 
 use raylib::init_window
 use raylib::close_window
@@ -15,6 +17,7 @@ use raylib::clear_background
 
 
 use raylib::draw_rectangle
+use raylib::draw_rectangle_pro
 
 
 use raylib::is_key_down
@@ -44,10 +47,12 @@ use raylib::resume_music_stream
 use raylib::unload_music_stream
 
 const f32 MAXIMUM_CAR_SPEED = 1000
-
+const f32 ROTATION_SPEED    = 50
 
 foreign "C"{
     fn printf(str fmt,...)->i32
+    fn cosf(f32 x)->f32
+    fn sinf(f32 x)->f32
 }
 
 
@@ -61,14 +66,6 @@ fn main(i32 argc,str *argv)->i32{
 
     set_target_fps(60)
 
-    i32 carWidth  = 30
-    i32 carHeight = 45
-
-    i32 carX      = (width / 2) - (carWidth / 2)
-    i32 carY      = (height / 2) - (carHeight / 2)
-
-    f32 carSpeed  = 0.0 
-
     init_audio_device()
     defer close_audio_device()
 
@@ -78,6 +75,21 @@ fn main(i32 argc,str *argv)->i32{
     play_music_stream(music)
     defer stop_music_stream(music)
 
+    i32 carWidth     = 30
+    i32 carHeight    = 45
+
+    f32 carX         = (width / 2) - (carWidth / 2)
+    f32 carY         = (height / 2) - (carHeight / 2)
+
+    f32 carSpeed     = 0.0 
+
+    i32 carDirection = -1
+    f32 carRotation  = -90
+
+    i32 carSpeedUp   = 100
+    i32 carSlowDown  = 200
+
+
     while !window_should_close(){
         f32 delta = get_frame_time()
 
@@ -86,7 +98,17 @@ fn main(i32 argc,str *argv)->i32{
         clear_background(background_color())
 
         if is_key_down(Key::Up){
-            carSpeed += 0.3 * delta 
+            carDirection = -1
+            carSpeed     += carSpeedUp * delta 
+
+            if carSpeed > MAXIMUM_CAR_SPEED{
+                carSpeed = MAXIMUM_CAR_SPEED
+            }
+
+        }
+        elif is_key_down(Key::Down){
+            carDirection = 1
+            carSpeed     -= carSpeedUp * delta 
 
             if carSpeed > MAXIMUM_CAR_SPEED{
                 carSpeed = MAXIMUM_CAR_SPEED
@@ -94,16 +116,38 @@ fn main(i32 argc,str *argv)->i32{
 
         }
         else{
-            carSpeed -= 0.1 * delta
+            carSpeed += carSlowDown * delta * carDirection
 
-            if carSpeed < 0{
+            if (carDirection == -1) and (carSpeed < 0){
+                carSpeed = 0
+            }
+            elif (carDirection == 1) and (carSpeed > 0){
                 carSpeed = 0
             }
         }
 
-        carY -= carSpeed * delta
+        if is_key_down(Key::Left){
+            carRotation -= ROTATION_SPEED * delta
+        }
 
-        draw_rectangle(carX,carY,carWidth,carHeight,car_color())
+        if carRotation >= 360{
+            carRotation = 0
+        }
+
+        f32 radians = degrees_to_radians(carRotation) as f32
+
+        f32 xMove = carSpeed * cosf(radians)
+        f32 yMove = carSpeed * sinf(radians)
+
+        carX += xMove * delta
+        carY += yMove * delta
+
+
+        Rectangle carRectangle = Rectangle::new(carX,carY,carHeight,carWidth)
+        Vector2 carOrigin      = Vector2::new(carWidth / 2,carHeight / 2)
+
+        draw_rectangle_pro(carRectangle,carOrigin,carRotation,car_color())
+
         end_drawing()
     }
 
@@ -119,4 +163,10 @@ fn background_color()->Color{
 
 fn car_color()->Color{
     return Color::new(255,158,45,255)
+}
+
+const f64 PI = 3.14159265358979323846
+
+fn degrees_to_radians(f64 degrees)->f64{
+    return ((PI * degrees) / (180 as f64)) as f64
 }

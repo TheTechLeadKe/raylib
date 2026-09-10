@@ -146,7 +146,7 @@ impl Color{
 }
 
 fn GREEN()->Color{
-    Color::new(0, 228, 48, 255)
+    return Color::new(0, 228, 48, 255)
 }
 
 
@@ -173,6 +173,59 @@ struct Music{
     void *ctcData
 }
 
+struct Rectangle{
+    f32 x
+    f32 y
+    f32 width
+    f32 height
+}
+
+
+impl Rectangle{
+    fn init(f32 x,f32 y,f32 width,f32 height){
+        self->x      = x
+        self->y      = y
+        self->width  = width
+        self->height = height
+    }
+
+    #[static(true)]
+    fn new(f32 x,f32 y,f32 width,f32 height)->Rectangle{
+        Rectangle node
+        node.init(x,y,width,height)
+        return node
+    }
+}
+
+
+struct Vector2{
+    f32 x
+    f32 y
+}
+
+impl Vector2{
+    fn init(f32 x,f32 y){
+        self->x = x
+        self->y = y
+    }
+
+    #[static(true)]
+    fn new(f32 x,f32 y)->Vector2{
+        Vector2 node
+        node.init(x,y)
+        return node
+    }
+
+    fn get_x()->f32{
+        return self->x
+    }
+
+    fn get_y()->f32{
+        return self->y
+    }
+}
+
+
 foreign "C"{
     fn InitWindow(i32 width,i32 height,str title)
     fn CloseWindow()
@@ -183,6 +236,7 @@ foreign "C"{
 
 
     fn DrawRectangle(i32 x,i32 y,i32 width,i32 height,Color color)
+    fn DrawRectanglePro(Rectangle rectangle,Vector2 origin,f32 rotation,Color color)
 
     fn IsKeyDown(i32 key)->bool
     fn IsKeyUp(i32 key)->bool
@@ -335,4 +389,7 @@ fn unload_music_stream(Music music){
 
 
 
+fn draw_rectangle_pro(Rectangle rectangle,Vector2 origin,f32 rotation,Color color){
+    return DrawRectanglePro(rectangle,origin,rotation,color)
+}
 

@@ -1,3 +1,5 @@
+use string::String
+
 // Raylib Types
 use raylib::Key
 use raylib::Color
@@ -136,15 +138,33 @@ impl Shape{
 }
 
 
+struct Collision{
+    f32 radius
+}
+
+impl Collision{
+    fn init(f32 radius){
+        self->radius = radius
+    }
+
+    #[static(true)]
+    fn new(f32 radius)->Collision{
+        Collision node
+        node.init(radius)
+        return node
+    }
+}
+
+
 struct Input{
-    i32 up
-    i32 down
-    i32 left
-    i32 right
+    bool up
+    bool down
+    bool left
+    bool right
 }
 
 impl Input{
-    fn init(i32 up,i32 down,i32 left,i32 right){
+    fn init(bool up,bool down,bool left,bool right){
         self->up    = up
         self->down  = down
         self->left  = left
@@ -153,7 +173,7 @@ impl Input{
 
 
     #[static(true)]
-    fn new(i32 up,i32 down,i32 left,i32 right)->Input{
+    fn new(bool up,bool down,bool left,bool right)->Input{
         Input node
         node.init(up,down,left,right)
         return node
@@ -161,6 +181,24 @@ impl Input{
    
 }
 
+
+struct Score{
+    i32 score
+}
+
+impl Score{
+    fn init(i32 score){
+        self->score = score
+    }
+
+    #[static(true)]
+    fn new(i32 score)->Score{
+        Score node
+        node.init(score)
+        return node
+    }
+    
+}
 
 
 struct LifeSpan{
@@ -185,4 +223,43 @@ impl LifeSpan{
 
 
 
+struct Entity{
+   i32 id 
+   String tag
+   bool isAlive
+   Transform *transform
+   Shape *shape
+   Collision *collision
+   Input *input
+   Score *score
+   LifeSpan *lifeSpan
+}
+
+
+
+impl Entity{
+    fn init(String tag,i32 id){
+        self->tag     = tag
+        self->id      = id
+        self->isAlive = true
+    }
+
+
+    fn destroy(){
+        self->isAlive = false
+    }
+
+
+    fn get_tag()->String{
+        return self->tag
+    }
+
+    fn get_id()->i32{
+        return self->id
+    }
+
+    fn is_alive()->bool{
+        return self->isAlive 
+    }
+}
 

@@ -1,0 +1,470 @@
+
+foreign "C"{
+    fn memcpy(void *dst,const void *src,u64 count)->void *
+
+    fn memcmp(const void *dst,const void *src,u64 count)->i32
+
+    fn memset(void *dst,i32 c,u64 count)->void *
+
+    fn malloc(u64 size)->void *
+    fn printf(char *fmt,...)->i32
+    fn free(void *addr)
+    fn strlen(str string)->u64
+}
+
+const i32 FALSE = 0
+const i32 TRUE  = 1
+
+const u64 STRING_DEFAULT_CAPACITY = 16
+const i64 I64_MIN                 = -9223372036854775808
+
+
+struct String{
+    u64 length
+    u64 capacity
+    char *data
+}
+
+
+impl String{
+    fn init(){
+        self->length   = 0
+        self->capacity = STRING_DEFAULT_CAPACITY
+        self->data     = malloc(self->capacity)
+
+        self->data[0]  = 0
+    }
+
+    fn init_sized(u64 capacity){
+        if capacity == 0{
+            capacity = 1 // always room for the null terminator
+        }
+
+        self->length   = 0
+        self->capacity = capacity
+        self->data     = malloc(capacity)
+
+        self->data[0]  = 0
+    }
+
+    fn destroy(){
+        if self->data != null{
+            free(self->data)
+        }
+
+        self->data     = null
+        self->length   = 0
+        self->capacity = 0
+    }
+
+    fn empty()->u32{
+        return self->length == 0
+    }
+
+    fn length()->u32{
+        return self->length
+    }
+
+    fn reserve(u64 newCapacity){
+        if newCapacity <= self->capacity{
+            return
+        }
+
+        char *newData = null
+
+        newData = malloc(newCapacity)
+
+        memcpy(newData,self->data,self->length)
+
+        free(self->data)
+
+        self->capacity           = newCapacity
+        self->data               = newData
+        self->data[self->length] = 0
+    }
+
+    fn ensure_capacity(u64 additionalLength){
+        if self->length + additionalLength + 1 <= self->capacity{
+            return
+        }
+
+        u64 newCapacity = self->capacity
+
+        while self->length + additionalLength + 1 > newCapacity{
+            newCapacity *= 2
+        }
+
+        self->reserve(newCapacity)
+    }
+
+    fn append_bytes(void *buffer,u64 length){
+        self->ensure_capacity(length)
+
+        memcpy(self->data + self->length,buffer,length)
+
+        self->length += length
+
+        self->data[self->length] = 0
+    }
+
+    fn push_char(char ch){
+        self->ensure_capacity(1)
+
+        self->data[self->length] = ch
+        self->length += 1
+
+        self->data[self->length] = 0
+    }
+
+    fn push_back(str text){
+        u64 textLength = strlen(text)
+
+        self->ensure_capacity(textLength)
+
+        memcpy(self->data + self->length,text,textLength)
+
+        self->length += textLength
+
+        self->data[self->length] = 0
+    }
+
+    fn push_i64(i64 value){
+        if value < 0{
+            self->push_char('-')
+
+            // -I64_MIN overflows i64 (its magnitude has no positive i64
+            // representation), so handle it as a literal string rather
+            // than negating.
+            if value == I64_MIN{
+                self->push_back("9223372036854775808")
+                return
+            }
+
+            value = -value
+        }
+
+        if value == 0{
+            self->push_char('0')
+            return
+        }
+
+        char[20] buffer
+        u64 count = 0
+
+        while value > 0{
+            u64 digit = value % 10
+            buffer[count] = ('0' as char) + (digit as char)
+            count += 1
+            value /= 10
+        }
+
+        while count > 0{
+            count -= 1
+            self->push_char(buffer[count])
+        }
+    }
+
+    fn to_i64()->i64{
+        String stripped = self->lstrip()
+
+        if stripped.length == 0{
+            return 0
+        }
+
+        u64 index = 0
+        i64 sign  = 1
+
+        if stripped.at(0) == '-'{
+            sign = -1
+            index += 1
+        }
+        elif stripped.at(0) == '+'{
+            index += 1
+        }
+
+        i64 result = 0
+
+        while index < stripped.length{
+            char ch = stripped.at(index)
+
+            if (ch < '0') or (ch > '9'){
+                break
+            }
+
+            i64 digit = (ch - '0') as i64
+            result    = (result * 10) + digit
+            index    += 1
+        }
+
+        return result * sign
+    }
+
+    fn clear(){
+        self->length  = 0
+        self->data[0] = 0
+    }
+
+    fn cstring()->str{
+        return self->data
+    }
+
+    // Out-of-range reads return the null terminator (0) rather than
+    // reading past the end of the buffer.
+    fn at(u64 index)->char{
+        if index >= self->length{
+            return 0
+        }
+
+        return self->data[index]
+    }
+
+    // Out-of-range writes are silently ignored rather than corrupting
+    // memory past the end of the buffer.
+    fn set(u64 index,char value){
+        if index >= self->length{
+            return
+        }
+
+        self->data[index] = value
+    }
+
+    fn from(str text)->String{
+        String result
+        result.init()
+
+        result.push_back(text)
+
+        return result
+    }
+
+    fn copy()->String{
+        String result
+        result.init_sized(self->length + 1)
+
+        memcpy(result.data,self->data,self->length)
+
+        result.length             = self->length
+        result.data[result.length] = 0
+
+        return result
+    }
+
+    fn equals(str other)->u32{
+        u64 otherLength = strlen(other)
+
+        if self->length != otherLength{
+            return FALSE
+        }
+
+        u64 ii = 0
+
+        while ii < self->length{
+            if self->data[ii] != other[ii]{
+                return FALSE
+            }
+
+            ii += 1
+        }
+
+        return TRUE
+    }
+
+    fn equals_string(String *other)->u32{
+        if self->length != other->length{
+            return FALSE
+        }
+
+        u64 ii = 0
+
+        while ii < self->length{
+            if self->data[ii] != other->data[ii]{
+                return FALSE
+            }
+
+            ii += 1
+        }
+
+        return TRUE
+    }
+
+    fn starts_with(str prefix)->u32{
+        u64 prefixLength = strlen(prefix)
+
+        if prefixLength > self->length{
+            return FALSE
+        }
+
+        u64 ii = 0
+
+        while ii < prefixLength{
+            if self->data[ii] != prefix[ii]{
+                return FALSE
+            }
+
+            ii += 1
+        }
+
+        return TRUE
+    }
+
+    fn slice(u64 start,u64 end)->String{
+        String result
+        result.init()
+
+        if start >= self->length{
+            return result
+        }
+
+        if end > self->length{
+            end = self->length
+        }
+
+        if start >= end{
+            return result
+        }
+
+        u64 ii = start
+
+        while ii < end{
+            result.push_char(self->data[ii])
+            ii += 1
+        }
+
+        return result
+    }
+
+    fn find_char(char ch)->i64{
+        return self->find_char_from(ch,0)
+    }
+
+    fn find_char_from(char ch,u64 start)->i64{
+        u64 ii = start
+
+        while ii < self->length{
+            if self->data[ii] == ch{
+                return ii as i64
+            }
+
+            ii += 1
+        }
+
+        return -1
+    }
+
+    fn is_space(char character)->u32{
+        return (character == 10) or (character == 13) or (character == ' ')
+    }
+
+    fn lstrip()->String{
+        u64 ii    = 0
+        u64 start = self->length // whole string is whitespace by default
+
+        while ii < self->length{
+            if not self->is_space(self->at(ii)){
+                start = ii
+                break
+            }
+
+            ii += 1
+        }
+
+        return self->slice(start,self->length)
+    }
+
+    fn rstrip()->String{
+        if self->length == 0{
+            return self->copy()
+        }
+
+        u64 ii  = self->length
+        i64 end = -1
+
+        while ii > 0{
+            ii -= 1
+
+            if not self->is_space(self->at(ii)){
+                end = ii as i64
+                break
+            }
+        }
+
+        if end == -1{
+            return self->copy()
+        }
+
+        return self->slice(0,(end + 1) as u64)
+    }
+
+    // Returns the byte offset of the first occurrence of `needle`, or -1
+    // if it does not occur. An empty needle matches at offset 0, matching
+    // the conventional semantics of strstr/String.indexOf.
+    fn find_string(String needle)->i64{
+        if needle.length == 0{
+            return 0
+        }
+
+        if needle.length > self->length{
+            return -1
+        }
+
+        u64 ii        = 0
+        u64 maxSearch = self->length - needle.length
+
+        while ii <= maxSearch{
+            u64 jj    = 0
+            u32 found = TRUE
+
+            while jj < needle.length{
+                if self->at(ii + jj) != needle.at(jj){
+                    found = FALSE
+                    break
+                }
+
+                jj += 1
+            }
+
+            if found{
+                return ii as i64
+            }
+
+            ii += 1
+        }
+
+        return -1
+    }
+
+    // Returns 0 on an empty string rather than reading self->data[-1]
+    // (which, since length is u64, would wrap to a massive out-of-range
+    // index and read arbitrary memory).
+    fn get_last()->char{
+        if self->length == 0{
+            return 0
+        }
+
+        return self->at(self->length - 1)
+    }
+
+    // No-op on an empty string rather than underflowing self->length
+    // (u64, so length - 1 at length == 0 would wrap to the largest
+    // possible u64 and corrupt every subsequent operation on this string).
+    fn pop(){
+        if self->length == 0{
+            return
+        }
+
+        self->length -= 1
+        self->set(self->length,0)
+    }
+
+
+    #[static(true)]
+    fn new(str text)->String{
+        String string
+        string.init_sized(strlen(text) + 1)
+        string.push_back(text)
+
+        return string
+    }
+}
+
+
