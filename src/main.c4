@@ -147,7 +147,7 @@ fn main(i32 argc,str *argv)->i32{
 
 
         Rectangle carRectangle = Rectangle::new(carX,carY,carHeight,carWidth)
-        Vector2 carOrigin      = Vector2::new(carWidth / 2,carHeight / 2)
+        Vector2 carOrigin      = Vector2::new(carHeight / 2,carWidth / 2)
 
         draw_rectangle_pro(carRectangle,carOrigin,carRotation,car_color())
 
